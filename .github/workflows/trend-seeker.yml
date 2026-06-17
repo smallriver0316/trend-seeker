@@ -2,8 +2,8 @@ name: TrendSeeker Daily Report
 
 on:
   schedule:
-    # 毎日 UTC 0:00 (JST 9:00) に自動実行
-    - cron: '0 0 * * *'
+    # 毎日 UTC 23:27 (JST 8:27) に自動実行
+    - cron: '27 23 * * *'
   workflow_dispatch:
     # GitHubのUIから手動で実行できるようにする
 
