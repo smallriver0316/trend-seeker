@@ -31,7 +31,28 @@ async function main() {
     console.log('--- TrendSeeker End ---');
   } catch (error) {
     console.error('Fatal Error during execution:', error);
+    await notifyFailure(error);
     process.exit(1);
+  }
+}
+
+async function notifyFailure(error: unknown): Promise<void> {
+  const webhookUrl = process.env.SLACK_WEBHOOK_URL;
+  if (!webhookUrl) {
+    console.error('SLACK_WEBHOOK_URL is not set; skipping Slack error notification.');
+    return;
+  }
+
+  const detail = error instanceof Error
+    ? `${error.name}: ${error.message}${error.stack ? `\n${error.stack}` : ''}`
+    : String(error);
+  const timestamp = new Date().toLocaleString('ja-JP', { timeZone: 'Asia/Tokyo' });
+  const text = `*【TrendSeeker エラー通知】*\n実行中にエラーが発生しました (${timestamp} JST)\n\n\`\`\`\n${detail}\n\`\`\``;
+
+  try {
+    await sendToSlack(webhookUrl, text);
+  } catch (slackError) {
+    console.error('Failed to send error notification to Slack:', slackError);
   }
 }
 
