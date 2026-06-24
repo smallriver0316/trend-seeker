@@ -1,15 +1,19 @@
-import { GoogleGenAI } from '@google/genai';
-import { Article } from './rss.js';
+import { GoogleGenAI } from "@google/genai";
+import { Article } from "./rss.js";
 
-export async function generateReport(apiKey: string, articles: Article[], topics: string[]): Promise<string> {
+export async function generateReport(
+  apiKey: string,
+  articles: Article[],
+  topics: string[],
+): Promise<string> {
   const ai = new GoogleGenAI({ apiKey });
 
   if (articles.length === 0) {
-    return `*【技術トレンド日報】*\n収集対象トピック: ${topics.map(t => `\`${t}\``).join(', ')}\n\n過去24時間以内に新しい記事は見つかりませんでした。`;
+    return `*【技術トレンド日報】*\n収集対象トピック: ${topics.map((t) => `\`${t}\``).join(", ")}\n\n過去24時間以内に新しい記事は見つかりませんでした。`;
   }
 
   const articlesJson = JSON.stringify(
-    articles.map(a => ({
+    articles.map((a) => ({
       title: a.title,
       link: a.link,
       source: a.source,
@@ -17,7 +21,7 @@ export async function generateReport(apiKey: string, articles: Article[], topics
       topics: a.topics,
     })),
     null,
-    2
+    2,
   );
 
   const prompt = `
@@ -25,7 +29,7 @@ export async function generateReport(apiKey: string, articles: Article[], topics
 QiitaとZennから収集された、過去24時間以内の技術記事リストを読み込み、指定されたトピックに関連する重要な情報をまとめた【技術トレンド日報】を作成してください。
 
 # 収集トピック
-${topics.map(t => `- ${t}`).join('\n')}
+${topics.map((t) => `- ${t}`).join("\n")}
 
 # 記事データ (JSON)
 \`\`\`json
@@ -52,13 +56,13 @@ ${articlesJson}
 
   try {
     const response = await ai.models.generateContent({
-      model: 'gemini-2.5-flash',
+      model: "gemini-3.5-flash",
       contents: prompt,
     });
 
-    return response.text || 'Error: Report generation returned empty response.';
+    return response.text || "Error: Report generation returned empty response.";
   } catch (error) {
-    console.error('Error generating report with Gemini:', error);
+    console.error("Error generating report with Gemini:", error);
     throw error;
   }
 }
