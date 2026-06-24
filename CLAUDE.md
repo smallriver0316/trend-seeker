@@ -18,10 +18,11 @@ TrendSeeker is a single-shot batch job, not a long-running service. `src/index.t
 
 1. **`config.ts` → `loadConfig()`** — reads `GEMINI_API_KEY` and `SLACK_WEBHOOK_URL` from env (via `dotenv`), and `topics: string[]` from `config.json` at `process.cwd()`. Missing env vars throw; missing/malformed `config.json` only warns and continues with empty topics.
 2. **`rss.ts` → `fetchAllArticles(topics, hoursAgo)`** — for each topic, fetches Zenn (`https://zenn.dev/topics/<topic>/feed`) and Qiita (`https://qiita.com/tags/<topic>/feed.atom`) in parallel via `rss-parser`, filters to articles newer than `hoursAgo`, and deduplicates across topics using a `Map` keyed by article URL. When the same article matches multiple topics, the topic tags are merged onto a single `Article`.
-3. **`report.ts` → `generateReport()`** — serializes articles (snippets truncated to 300 chars) into a Japanese prompt for `gemini-2.5-flash` via `@google/genai`. The prompt enforces **Slack mrkdwn** specifically — links MUST be `<URL|text>`, never `[text](URL)`. Empty-articles path returns a hardcoded "no articles found" message without calling Gemini.
+3. **`report.ts` → `generateReport()`** — serializes articles (snippets truncated to 300 chars) into a Japanese prompt for `gemini-3.5-flash` via `@google/genai`. The prompt enforces **Slack mrkdwn** specifically — links MUST be `<URL|text>`, never `[text](URL)`. Empty-articles path returns a hardcoded "no articles found" message without calling Gemini.
 4. **`slack.ts` → `sendToSlack()`** — single `fetch` POST of `{ text }` to the incoming webhook.
 
 Key design constraints to preserve:
+
 - **ESM-only** (`"type": "module"`, `module: NodeNext`). Internal imports must use `.js` extensions even when importing `.ts` source (e.g. `from './rss.js'`).
 - `config.json` is resolved from `process.cwd()`, not relative to the source file — running from a different directory will silently lose topics.
 - Slack message format is `mrkdwn` via the `text` field of an incoming webhook (no Block Kit). The Gemini prompt is the single source of truth for output formatting rules.
