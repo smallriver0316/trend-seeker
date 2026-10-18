@@ -6,7 +6,8 @@
   "type": "module",
   "scripts": {
     "start": "tsx src/index.ts",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "tsx test-pipeline.ts"
   },
   "dependencies": {
     "@google/genai": "^2.8.0",
