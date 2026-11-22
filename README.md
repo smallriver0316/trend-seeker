@@ -4,7 +4,7 @@ TrendSeeker is an automated technology trend aggregator and reporter. It automat
 
 ## Key Features
 
-- **Automated RSS Feed Collection**: Automatically fetches recent articles published within the last 24 hours from Zenn topic feeds and Qiita tag feeds, and deduplicates them.
+- **Automated RSS Feed Collection**: Automatically fetches recent articles published within the last 24 hours from Zenn topic feeds and Qiita tag feeds, keeps up to 8 unique articles per topic, and deduplicates them.
 - **AI-Powered Summary & Filtering**: Uses the `gemini-3.8-flash` model to filter out irrelevant posts and create a structured daily tech digest.
 - **Slack Notification**: Formats reports in Slack-compatible markdown (`mrkdwn`) with clean formatting and embeds correct Slack-style hyperlinks.
 - **GitHub Actions Scheduled Runs**: Runs on a daily cron schedule (default: 9:00 AM JST / 0:00 UTC) with manual trigger support.

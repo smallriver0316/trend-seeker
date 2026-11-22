@@ -10,6 +10,7 @@ export interface Article {
 }
 
 const parser = new Parser();
+const MAX_ARTICLES_PER_TOPIC = 8;
 
 export async function fetchZennArticles(topic: string, sinceDate: Date): Promise<Article[]> {
   const url = `https://zenn.dev/topics/${encodeURIComponent(topic)}/feed`;
@@ -77,10 +78,18 @@ export async function fetchAllArticles(topics: string[], hoursAgo: number = 24):
       fetchQiitaArticles(topic, sinceDate),
     ]);
 
-    const combined = [...zenn, ...qiita];
+    const combined = [...zenn, ...qiita].sort(
+      (a, b) => new Date(b.pubDate).getTime() - new Date(a.pubDate).getTime()
+    );
+    const seenTopicLinks = new Set<string>();
+    let topicArticleCount = 0;
 
     for (const article of combined) {
-      if (!article.link) continue;
+      if (!article.link || seenTopicLinks.has(article.link)) continue;
+      if (topicArticleCount >= MAX_ARTICLES_PER_TOPIC) break;
+
+      seenTopicLinks.add(article.link);
+      topicArticleCount++;
       const existing = articleMap.get(article.link);
       if (existing) {
         if (!existing.topics.includes(topic)) {
